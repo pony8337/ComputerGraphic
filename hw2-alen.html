@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+ body {
+  background-color: #fff;
+  color: #111;
+  margin: 0px;
+  overflow: hidden;
+  font-family: Monospace;
+  font-size: 30px;
+  position: absolute;
+}
+
+#info {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  color: #ffff00;
+}
+
+#gui {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  height: 500px;
+  //text-align: center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="info">hw3</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
+<script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+
+<script>
+
+var camera, scene, renderer, control;
+var leftHand, rightHand, body, head, neck, bootL, bootR, handRz, handLz;
+var gcontrols; 
+
+init();
+animate();
+
+function init() {
+  THREE.ImageUtils.crossOrigin = ''; 
+ renderer = new THREE.WebGLRenderer({
+    antialias: true
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+
+  document.body.appendChild(renderer.domElement);
+
+  scene = new THREE.Scene();
+
+  //camera
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+  camera.position.z = 500;
+  scene.add(camera);
+  control = new THREE.OrbitControls(camera, renderer.domElement);
+ 
+  leftHand = new THREE.Object3D();
+  rightHand = new THREE.Object3D();
+  body = new THREE.Object3D();
+  head = new THREE.Object3D();
+  neck = new THREE.Object3D();
+  bootL = new THREE.Object3D();
+  bootR = new THREE.Object3D();  
+  handLz = new THREE.Object3D();
+  handRz = new THREE.Object3D();
+  var planL = new THREE.Object3D();
+  var planR = new THREE.Object3D();  
+  
+  /*****************************************/
+    //LOAD IMAGES
+    
+  var Face_Materials = [];
+   Face_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/yASxMxx.jpg'), side: THREE.DoubleSide}));
+   Face_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/68s8fJS.jpg'), side: THREE.DoubleSide}));
+   Face_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/KXw2gT6.jpg'), side: THREE.DoubleSide}));
+   Face_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/HYAAEHm.jpg'), side: THREE.DoubleSide}));
+   Face_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/PsGRuA7.jpg'), side: THREE.DoubleSide}));
+   Face_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/HYAAEHm.jpg'), side: THREE.DoubleSide}));
+   
+   var body_Materials = [];
+     body_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/a8SnQXr.jpg'), side: THREE.DoubleSide}));
+    body_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/a8SnQXr.jpg'), side: THREE.DoubleSide}));
+     body_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/zLkV5Sk.jpg'), side: THREE.DoubleSide}));
+      body_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/e1gQcsU.jpg'), side: THREE.DoubleSide}));
+       body_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/QtU3H5h.jpg'), side: THREE.DoubleSide}));
+        body_Materials.push(new THREE.MeshBasicMaterial({map: THREE.ImageUtils.loadTexture('http://i.imgur.com/s2YxMMI.jpg'), side: THREE.DoubleSide}));
+   var head_Material = new THREE.MeshFaceMaterial(Face_Materials);
+   var body_Material = new THREE.MeshFaceMaterial(body_Materials);
+   /****************************/
+  
+  var boxB = new THREE.Mesh(new THREE.BoxGeometry(50, 80, 50), body_Material);
+
+  var plan1 = new THREE.Mesh(new THREE.PlaneGeometry(50, 20), new THREE.MeshBasicMaterial({
+   side: THREE.DoubleSide, color: 0xc2a57d 
+  }));
+  plan1.position.y = -48;
+  plan1.position.z = 32;
+  plan1.rotation.x = -Math.PI/5;
+  
+  var plan2 = new THREE.Mesh(new THREE.PlaneGeometry(50, 20), new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide, color: 0xc2a57d 
+  }));
+  plan2.position.y = -48;
+  plan2.position.z = -32;
+  plan2.rotation.x = Math.PI/5;
+  var plan3 = new THREE.Mesh(new THREE.PlaneGeometry(50, 20), new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide, color: 0xc2a57d 
+  }));  
+  plan3.rotation.x = Math.PI/5; 
+  planL.add(plan3);  
+  planL.rotation.y = Math.PI/2;
+  planL.position.y = -48;
+  planL.position.x = -32;
+  var plan4 = new THREE.Mesh(new THREE.PlaneGeometry(50, 20), new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide, color: 0xc2a57d 
+  }));  
+  plan4.rotation.x = -Math.PI/5; 
+  planR.add(plan4);
+  planR.rotation.y = Math.PI/2;
+  planR.position.y = -48;
+  planR.position.x = 32;
+  
+  body.add(plan1);   
+  body.add(plan2); 
+  body.add(planL);
+  body.add(planR);
+
+  //head
+  var headM = new THREE.Mesh(new THREE.BoxGeometry(100, 60, 70),head_Material);
+
+ 
+ 
+ 
+ 
+  neck.add(headM);
+  headM.position.y = 50;
+  var neck2 = new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({
+    color: 0xc2a57d
+  }));
+  neck2.position.y = 20;
+  
+  var neck3 = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 10, 64), new THREE.MeshBasicMaterial({
+   color: 0xc2a57d
+  }));
+  neck3.rotation.z = Math.PI / 2;
+  neck3.position.set(0,0,0);  
+  
+  neck.add(head);
+  neck.add(neck2);
+  neck.add(neck3);
+ 
+  neck.position.y = 20;
+  //hand
+  var handL = new THREE.Mesh(new THREE.BoxGeometry(20, 50, 20), new THREE.MeshBasicMaterial({
+    color: 0xc2a57d
+  }));
+  var ankleL = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 20, 64), new THREE.MeshBasicMaterial({
+     color: 0xc2a57d
+  }));
+  ankleL.rotation.x = Math.PI / 2;
+  ankleL.position.set(0,0,0);  
+  handL.position.set(0,-30,0);
+  leftHand.add(handL);
+  leftHand.add(ankleL);
+  leftHand.position.set(0,0,0);
+  handLz.position.set(35, 25, 0);
+  handLz.add(leftHand);
+  
+   var handR = new THREE.Mesh(new THREE.BoxGeometry(20, 50, 20), new THREE.MeshBasicMaterial({
+    color: 0xc2a57d
+  }));
+  var ankleR = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 20, 64), new THREE.MeshBasicMaterial({
+     color: 0xc2a57d
+  }));
+  
+  ankleR.position.set(0,0,0);
+  ankleR.rotation.z = Math.PI / 2;
+  handR.position.set(0,-30,0);
+  rightHand.add(handR);
+  rightHand.add(ankleR); 
+  rightHand.rotation.y = Math.PI/ 2;
+  rightHand.position.set(0,0,0);   
+  handRz.position.set(-35,25,0);
+  handRz.add(rightHand);
+  //boot
+  var boot1 = new THREE.Mesh(new THREE.BoxGeometry(20, 50, 40), new THREE.MeshBasicMaterial({
+    color: 0xc2a57d
+  }));
+  var ankle1 = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 40, 64), new THREE.MeshBasicMaterial({
+   color: 0xc2a57d
+  }));  
+  ankle1.rotation.x = Math.PI/2;
+  ankle1.position.set(0,0,0);   
+  boot1.position.set(0,-30,0);
+  bootL.add(ankle1);  
+  bootL.add(boot1);
+ bootL.position.set(-15,-45,0);
+   var boot2 = new THREE.Mesh(new THREE.BoxGeometry(20, 50, 40), new THREE.MeshBasicMaterial({
+    color: 0xc2a57d
+  }));
+  var ankle2 = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 40, 64), new THREE.MeshBasicMaterial({
+    color: 0xc2a57d
+  }));  
+  ankle2.rotation.x = Math.PI/2;
+  ankle2.position.set(0,0,0);   
+  boot2.position.set(0,-30,0);
+  bootR.add(ankle2);  
+  bootR.add(boot2);
+ bootR.position.set(15,-45,0);
+  scene.add(bootR); 
+  scene.add(bootL);  
+//  bootL.rotation.z = Math.PI/2;
+  head.position.y = 70;
+  scene.add(neck);
+  body.add(boxB);
+  scene.add(head);
+  scene.add(body);
+  scene.add(handLz);
+  scene.add(handRz);  
+  
+  
+    
+  gcontrols = {
+    headz: 0.1,
+    headx: 0.1,
+    handLeftz: 0.1,
+    handLeftx: 0.1,
+    handRightz: 0.1,
+    handRightx: 0.1,    
+    footLeftz: 0.1,
+    footLeftx: 0.1,
+    footRightz: 0.1,
+    footRightx: 0.1
+  } 
+  var gui = new dat.GUI({load: loadJSON(), preset: 'pose1'});
+  gui.remember (gcontrols);   
+  gui.add(gcontrols, 'headz', -Math.PI, Math.PI);//min, max
+  gui.add(gcontrols, 'headx', -Math.PI, Math.PI);//min, max
+  gui.add(gcontrols, 'handLeftz', -Math.PI, Math.PI/2);
+  gui.add(gcontrols, 'handLeftx', -Math.PI, Math.PI/2);
+  gui.add(gcontrols, 'handRightz', -Math.PI, Math.PI/2);
+  gui.add(gcontrols, 'handRightx', -Math.PI/2, Math.PI/2);
+  gui.add(gcontrols, 'footLeftz', -Math.PI, Math.PI);
+  gui.add(gcontrols, 'footLeftx', -Math.PI, Math.PI);
+  gui.add(gcontrols, 'footRightz', -Math.PI, Math.PI);
+  gui.add(gcontrols, 'footRightx', -Math.PI, Math.PI);
+  
+  window.addEventListener('resize', onWindowResize, false);
+}
+
+
+
+
+
+function loadJSON() {
+  return {
+    "preset": "pose3",
+    "remembered": {
+      "Default": {
+        "0": {
+          "headz": 0,
+          "headx": 0,
+          "handLeftz": 0,
+          "handLeftx": 0,
+          "handRightz": 0,
+          "handRightx": 0,
+          "footLeftz": 0,
+          "footLeftx": 0,
+          "footRightz": 0,
+          "footRightx": 0
+        }
+      },
+    "pose1": {
+      "0": {
+         "headz": 0.05137622801518793,
+        "headx": -0.424172328819596,
+        "handLeftz": 0.7816829402971783,
+        "handLeftx": -0.5430594680282925,
+        "handRightz": -1.1035274100121453,
+        "handRightx": 0.3993334086634961,
+        "footLeftz": -1.3752694424891652,
+        "footLeftx": -0.5600433450581059,
+        "footRightz": 1.410086390400286,
+        "footRightx": -0.4921078369388514
+      }
+    },
+      "pose2": {
+        "0": {
+          "headz": -0.15650535047681657,
+          "headx": -0.295346620389048,
+          "handLeftz": -0.39064553254092904,
+          "handLeftx": -0.6336177548873341,
+          "handRightz": 0.44240208693245986,
+          "handRightx": -0.21709394515063973,
+          "footLeftz": 0.6765422689965725,
+          "footLeftx": -0.43418789030127947,
+          "footRightz": -0.43418789030127947,
+          "footRightx": -0.295346620389048
+        }
+      },
+      "pose3": {
+        "0": {
+          "headz": -0.2259259854329323,
+          "headx": 0.32943909421599393,
+          "handLeftz": -0.7030383898434498,
+          "handLeftx": 0.4076917694544018,
+          "handRightz": 0.44240208693245986,
+          "handRightx": -0.147673310194524,
+          "footLeftz": -0.2259259854329323,
+          "footLeftx": 0.5377009990843407,
+          "footRightz": 0.46828036412822494,
+          "footRightx": 0.12117718934764632
+        }
+      }
+    },
+    "closed": false,
+    "folders": {}
+  }
+}
+
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+//leftHand, rightHand, body, head, neck, bootL, bootR;
+function animate() {
+  requestAnimationFrame(animate);
+  
+  neck.rotation.z = gcontrols.headz;
+  neck.rotation.x = gcontrols.headx;
+  handLz.rotation.z = gcontrols.handLeftz;
+  leftHand.rotation.x = gcontrols.handLeftx;
+  handRz.rotation.z = gcontrols.handRightz;
+  rightHand.rotation.x = gcontrols.handRightx;
+  bootL.rotation.z = gcontrols.footLeftz;
+  bootL.rotation.x = gcontrols.footLeftx;
+  bootR.rotation.z = gcontrols.footRightz;
+  bootR.rotation.x = gcontrols.footRightx;
+  render();
+  update();
+}
+
+function update() {
+  control.update();
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+
+</script>
+
+</body>
+</html>

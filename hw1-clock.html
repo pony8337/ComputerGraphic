@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	body {
+  background-color: #fff;
+  color: #111;
+  margin: 0px;
+  overflow: hidden;
+  font-family: Monospace;
+  font-size: 30px;
+  position: absolute;
+}
+
+#info {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  padding: 5px;
+  text-align: center;
+  color: #ffff00;
+}
+
+</style>
+</head>
+
+<body>
+<div id="info">Timer
+  <br/>
+  <br/>
+  <button id="turn" style="width:20%">turn</button>
+  <button id="change" style="width:20%">quartz</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
+<script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<script>
+
+var camera, scene, renderer, control;
+var frame, group, needle, count = 0,
+  mode = 0,
+  angle = 0,
+  turn = false;
+var clock = new THREE.Clock();
+var background ;
+init();
+animate();
+
+//button
+$('#turn').click(function() {
+  turn = !turn;
+  if (turn)
+    $('#turn').text("pause");
+  else
+    $('#turn').text("turn");
+});
+
+$('#change').click(function() {
+  if (mode == 0) {
+    mode = 1;
+    count++;
+    $('#change').text("sector");
+  } else if (mode == 1) {
+    mode = 2;
+    $('#change').text("!quartz");
+  } else if (mode == 2) {
+    mode = 0;
+    $('#change').text("quartz");
+  }
+});
+
+//init
+function init() {
+  scene = new THREE.Scene();
+
+  renderer = new THREE.WebGLRenderer({
+    antialias: true
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x888888);
+
+  document.body.appendChild(renderer.domElement);
+
+  //camera
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+  camera.position.z = 500;
+  scene.add(camera);
+
+  control = new THREE.OrbitControls(camera, renderer.domElement);
+	//top
+  var topG = new THREE.CylinderGeometry( 15, 15, 15, 64 );
+  var topM = new THREE.MeshBasicMaterial({color:0xff0000});
+  var top = new THREE.Mesh(topG, topM);
+  top.position.set(0, 140, 0);
+  scene.add(top);
+  
+  //box
+  var boxG = new THREE.BoxGeometry( 15, 15, 1 );
+  var boxM = new THREE.MeshBasicMaterial({color:0x3A006F});
+  var box1 = new THREE.Mesh(boxG, boxM);
+  box1.position.set(0, 105, 1);
+  scene.add(box1); 
+
+  var box2 = new THREE.Mesh(boxG, boxM);
+  box2.position.set(0, -105, 1);
+  scene.add(box2);
+	
+  var box3 = new THREE.Mesh(boxG, boxM);
+  box3.position.set(-105, 0, 1);
+  scene.add(box3);
+  
+  var box4 = new THREE.Mesh(boxG, boxM);
+  box4.position.set(105, 0, 1);
+  scene.add(box4);
+  
+  //circle
+  var cirG = new THREE.CircleGeometry(150, 12);
+  var cirM = new THREE.MeshBasicMaterial({
+    color: 0x000000
+  });
+  var circle = new THREE.Mesh(cirG, cirM);
+  circle.rotation.z = Math.PI / 12;
+  scene.add(circle);
+
+  //bot cirle
+  var BotG = new THREE.CircleGeometry(110, 64);
+  var BotM = new THREE.MeshBasicMaterial({
+    color: 0xc0c0c0
+  });
+  var circleBot = new THREE.Mesh(BotG, BotM);
+  circleBot.position.set(0, 0, 1);
+  scene.add(circleBot);
+  var needG = new THREE.CircleGeometry(110, 256, 2 * Math.PI - Math.PI / 72, Math.PI / 72);
+  var needM = new THREE.MeshBasicMaterial({
+    color: 0xffffff
+  });
+  needle = new THREE.Mesh(needG, needM);
+  frame = new THREE.Object3D();
+  group = new THREE.Object3D();
+  needle.rotation.z = 3 / 2 * Math.PI;
+  needle.position.set(0, 110, 3);
+  frame.add(needle);
+  scene.add(frame);
+  window.addEventListener('resize', onWindowResize, false);
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  var dt = clock.getDelta();
+ 
+ if (turn) {
+    count += dt;
+    var run = count;
+    if (mode == 1)
+      run = Math.floor(run);
+    angle = run * Math.PI / 30;
+    frame.rotation.z = -angle;
+  }   	
+	if(mode == 2){
+ 		 section();
+  }else if(mode!=2){
+  		scene.remove(group);
+      scene.add(frame);
+  }
+
+  render();
+  update();
+}
+
+function section(){
+	  group.remove(background);
+    var backG = new THREE.CircleGeometry(110, 64, 1 * Math.PI / 2 - count * Math.PI / 30, count * Math.PI / 30);
+    var backM = new THREE.MeshBasicMaterial();
+    background = new THREE.Mesh(backG, backM);
+    background.position.set(0, 0, 2);
+    group.add(background);
+    scene.remove(frame);
+    scene.add(group);
+}
+function update() {
+  control.update();
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+
+
+</script>
+
+</body>
+</html>
