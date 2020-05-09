@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<style> body {margin: 0;} </style>
+<body>
+    <script src="https://threejs.org/build/three.js"></script>
+     <!-- [debug]++ -->
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+     <!-- [debug]-- -->
+    <script>
+        var scene
+        var camera
+        var renderer
+        var earth
+        var cloud
+        // var cameraControl
+
+        var controls = new function () {
+            this.rotationSpeed = 0.002;
+            // this.cameraZ = 250;
+		};
+
+        var debugFun = function () {
+            gui = new dat.GUI()
+            gui.add(controls, 'rotationSpeed', 0, 0.1);
+            // gui.add(controls, 'cameraZ', 150, 450);
+        }
+
+        var onWindowResize = function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        var init = function () {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 300;
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            cameraControl = new THREE.OrbitControls(camera, renderer.domElement);  //[debug] for moving camera
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        var creatGaraxy = function () {
+            var galaxyGeometry = new THREE.SphereGeometry(500, 32, 32);
+            var galaxyMaterial = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/7BXHj58.png'), side: THREE.BackSide});
+            var galaxy = new THREE.Mesh(galaxyGeometry, galaxyMaterial);
+
+            scene.add(galaxy)
+        }
+
+        var creatEarth = function () {
+            var geometry = new THREE.SphereGeometry(50, 200, 200);
+            // var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/bLgonuo.png')});
+            var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/oWpjcxm.jpg')});
+            earth = new THREE.Mesh(geometry, material);
+            // earth.rotation.x = -0.5;
+            scene.add(earth);
+        }
+
+        // cloud test
+        var creatCloud = function () {
+            var geometry = new THREE.SphereGeometry(51, 200, 200);
+            var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/YTQiqqs.jpg'), transparent: true, opacity: 0.2});
+            cloud = new THREE.Mesh(geometry, material);
+            scene.add(cloud);
+        }
+
+
+        var animate = function () {
+            requestAnimationFrame(animate);
+            earth.rotation.y -= controls.rotationSpeed;
+            cloud.rotation.x -= controls.rotationSpeed;
+            cloud.rotation.y -= controls.rotationSpeed;
+            cloud.rotation.z -= controls.rotationSpeed;
+            //[debug]++
+            // camera.position.z = controls.cameraZ;
+            cameraControl.update();  
+            //[debug]-- 
+            renderer.render(scene, camera);
+        };
+
+        init();
+        creatGaraxy();
+        creatEarth();
+        creatCloud();
+        debugFun();
+        animate();
+    </script>
+</body>
+</html>
