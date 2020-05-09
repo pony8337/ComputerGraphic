@@ -44,7 +44,8 @@
 
         var creatGaraxy = function () {
             var galaxyGeometry = new THREE.SphereGeometry(500, 32, 32);
-            var galaxyMaterial = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/7BXHj58.png'), side: THREE.BackSide});
+            // var galaxyMaterial = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/7BXHj58.png'), side: THREE.BackSide});
+            var galaxyMaterial = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('picture/galaxy.png'), side: THREE.BackSide});
             var galaxy = new THREE.Mesh(galaxyGeometry, galaxyMaterial);
 
             scene.add(galaxy)
@@ -52,17 +53,17 @@
 
         var creatEarth = function () {
             var geometry = new THREE.SphereGeometry(50, 200, 200);
-            // var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/bLgonuo.png')});
-            var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/oWpjcxm.jpg')});
+            // var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/oWpjcxm.jpg')});
+            var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('picture/earth.jpg')});
             earth = new THREE.Mesh(geometry, material);
-            // earth.rotation.x = -0.5;
             scene.add(earth);
         }
 
         // cloud test
         var creatCloud = function () {
             var geometry = new THREE.SphereGeometry(51, 200, 200);
-            var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/YTQiqqs.jpg'), transparent: true, opacity: 0.2});
+            // var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('https://i.imgur.com/YTQiqqs.jpg'), transparent: true, opacity: 0.2});
+            var material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('picture/clouds.jpg'), transparent: true, opacity: 0.2});
             cloud = new THREE.Mesh(geometry, material);
             scene.add(cloud);
         }
@@ -75,7 +76,6 @@
             cloud.rotation.y -= controls.rotationSpeed;
             cloud.rotation.z -= controls.rotationSpeed;
             //[debug]++
-            // camera.position.z = controls.cameraZ;
             cameraControl.update();  
             //[debug]-- 
             renderer.render(scene, camera);
